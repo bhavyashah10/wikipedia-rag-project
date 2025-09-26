@@ -1,0 +1,45 @@
+# Wikipedia RAG Configuration
+
+# Data paths
+data:
+  raw_dump: "data/raw/simplewiki-latest-pages-articles.xml.bz2"
+  processed_dir: "data/processed/"
+  embeddings_dir: "data/embeddings/"
+
+# Processing settings
+processing:
+  min_article_length: 100  # Minimum characters for an article
+  max_article_length: 50000  # Maximum characters for an article
+  chunk_size: 1000  # Characters per chunk
+  chunk_overlap: 200  # Overlap between chunks
+  batch_size: 100  # Articles to process in one batch
+
+# Embedding settings
+embeddings:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"  # Fast, good quality
+  dimension: 384  # Embedding dimension for the above model
+  normalize: true
+
+# FAISS settings
+faiss:
+  index_type: "flat"  # "flat" for exact search, "ivf" for approximate
+  metric: "cosine"  # "cosine" or "euclidean"
+
+# LLM settings
+llm:
+  provider: "ollama"
+  model: "llama2:7b-chat"  # Will install this with Ollama
+  base_url: "http://localhost:11434"
+  temperature: 0.7
+  max_tokens: 2048
+
+# RAG settings
+rag:
+  top_k: 5  # Number of chunks to retrieve
+  score_threshold: 0.7  # Minimum similarity score
+  max_context_length: 4000  # Max characters in context
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/wikipedia_rag.log"

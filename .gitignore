@@ -1,0 +1,71 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+
+# Data files (too large for git)
+data/raw/*.xml.bz2
+data/raw/*.xml
+data/processed/*.json
+data/embeddings/
+*.faiss
+*.index
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Jupyter Notebooks (optional - remove if you want to track them)
+.ipynb_checkpoints/
+
+# Environment variables
+.env
+
+# Model cache (sentence-transformers models)
+.cache/
+models/
+
+# Temporary files
+tmp/
+temp/

@@ -25,9 +25,10 @@ Wikipedia XML → Parser → Chunker → Embeddings → FAISS Index
 - ✅ **Wikipedia Download**: Simple English Wikipedia (200MB → 800MB uncompressed)
 - ✅ **XML Parsing**: 262,105 articles extracted and cleaned
 - ✅ **Text Chunking**: 569,456 chunks created (avg 2.2 chunks/article)
-- 🔄 **Next**: Embedding generation with sentence-transformers
-- 🔄 **Next**: FAISS index creation
-- 🔄 **Next**: Ollama LLM integration
+- ✅ **Embedding Generation**: 569K chunks → 384-dim vectors (834MB)
+- ✅ **FAISS Index**: Semantic search over 569K vectors (sub-second queries)
+- 🔄 **Next**: Ollama LLM integration for RAG conversations
+- 🔄 **Next**: OpenWebUI web interface
 - 🔄 **Next**: MCP agentic layer
 
 ## 🚀 Quick Start
@@ -64,6 +65,24 @@ python test_parser.py
 
 # Create text chunks
 python src/data_processing/text_chunker.py
+
+# Generate embeddings (10-15 minutes)
+python src/embeddings/embedding_generator.py
+
+# Build FAISS index for search
+python src/retrieval/faiss_indexer.py
+```
+
+### Test the RAG System
+```bash
+# Test semantic search
+python src/retrieval/faiss_indexer.py
+
+# Example queries that work:
+# - "What is artificial intelligence?"
+# - "How do computers work?" 
+# - "Tell me about space exploration"
+# - "What is machine learning?"
 ```
 
 ## 📁 Project Structure
@@ -72,14 +91,14 @@ python src/data_processing/text_chunker.py
 wikipedia-rag-project/
 ├── data/
 │   ├── raw/                    # Wikipedia XML dumps
-│   ├── processed/              # Clean articles & chunks
-│   └── embeddings/             # FAISS indices & vectors
+│   ├── processed/              # Clean articles & chunks (569K chunks)
+│   └── embeddings/             # FAISS indices & vectors (1.6GB)
 ├── src/
 │   ├── data_processing/        # XML parser & text chunker
-│   ├── embeddings/             # Embedding generation
+│   ├── embeddings/             # Embedding generation (sentence-transformers)
 │   ├── retrieval/              # FAISS search & RAG
-│   ├── llm_integration/        # Ollama interface
-│   └── mcp_agents/             # MCP tools & agents
+│   ├── llm_integration/        # Ollama interface (coming next)
+│   └── mcp_agents/             # MCP tools & agents (coming next)
 ├── config/                     # YAML configurations
 ├── notebooks/                  # Jupyter experiments
 └── logs/                       # Application logs
@@ -103,6 +122,18 @@ See `config/config.yaml` for:
 - **Average**: 2.2 chunks per article
 - **Processing Time**: ~5 minutes on M1 MacBook Air
 
+**Embedding Generation:**
+- **Model**: sentence-transformers/all-MiniLM-L6-v2
+- **Vectors**: 569,456 × 384 dimensions
+- **Size**: 834MB embeddings + 132MB metadata
+- **Processing Time**: ~15 minutes on M1 MacBook Air
+
+**FAISS Search Performance:**
+- **Index Size**: 834MB (cosine similarity, flat index)
+- **Search Speed**: Sub-second queries over 569K vectors
+- **Quality**: Excellent semantic relevance for test queries
+- **Memory Usage**: ~2GB RAM during search
+
 ## 🛠️ Tech Stack
 
 - **Data Processing**: Python, lxml, BeautifulSoup
@@ -115,24 +146,37 @@ See `config/config.yaml` for:
 
 ## 📈 Next Steps
 
-1. **Embedding Generation** - Convert chunks to 384-dim vectors
-2. **FAISS Index** - Build searchable vector database  
-3. **RAG Pipeline** - Connect retrieval to LLM
-4. **Ollama Integration** - Local model serving
-5. **MCP Agents** - Tool use and reasoning
-6. **Scale to Full Wikipedia** - Process complete English Wikipedia
+1. **Ollama Integration** - Local LLM serving (Llama2-7B, Mistral-7B)
+2. **RAG Pipeline** - Connect FAISS search to LLM responses
+3. **OpenWebUI** - Web-based chat interface
+4. **MCP Agents** - Tool use and autonomous reasoning
+5. **Scale to Full Wikipedia** - Process complete English Wikipedia (~6.7M articles)
+
+## 💡 Example Search Results
+
+The system already demonstrates excellent semantic search:
+
+**Query: "What is artificial intelligence?"**
+- ✅ Returns actual AI definition articles
+- ✅ Similarity scores: 0.540-0.640 (high relevance)
+- ✅ Sub-second response time
+
+**Query: "How do computers work?"**  
+- ✅ Finds computer architecture explanations
+- ✅ Returns technical details about processors, circuits
+- ✅ Perfect semantic matching (not just keyword search)
 
 ## 🔧 Hardware Considerations
 
-**Current (Simple Wiki):**
-- Storage: ~5GB total
-- RAM: ~2GB during processing
-- Processing: ~5 minutes
+**Current (Simple Wiki + RAG Search):**
+- Storage: ~5GB total (chunks + embeddings + index)
+- RAM: ~2GB during search, ~4GB during embedding generation
+- Processing: ~20 minutes total setup time
 
 **Full Wikipedia (Estimated):**
 - Storage: ~120-150GB total  
 - RAM: ~4-6GB during processing
-- Processing: ~2-4 hours
+- Processing: ~2-4 hours total setup time
 
 ## 📝 License
 

@@ -11,6 +11,7 @@ beautifulsoup4>=4.11.0
 sentence-transformers>=2.2.0
 transformers>=4.20.0
 torch>=2.0.0
+sentence_transformers
 
 # Vector database
 faiss-cpu>=1.7.4

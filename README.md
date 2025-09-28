@@ -40,7 +40,7 @@ Wikipedia XML → Parser → Chunker → Embeddings → FAISS Index
 
 ### Setup
 ```bash
-git clone <this-repo>
+git clone https://github.com/bhavyashah10/wikipedia-rag-project.git
 cd wikipedia-rag-project
 
 # Create virtual environment
@@ -177,7 +177,3 @@ The system already demonstrates excellent semantic search:
 - Storage: ~120-150GB total  
 - RAM: ~4-6GB during processing
 - Processing: ~2-4 hours total setup time
-
-## 📝 License
-
-MIT License - See LICENSE file for details.

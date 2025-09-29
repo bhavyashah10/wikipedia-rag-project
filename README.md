@@ -1,45 +1,77 @@
 # Wikipedia RAG System
 
-A locally-hosted RAG (Retrieval Augmented Generation) system using Wikipedia as knowledge base, with Ollama for LLM serving and MCP for agentic capabilities.
+A fully functional, locally-hosted RAG (Retrieval Augmented Generation) system using Wikipedia as knowledge base, with Ollama for LLM serving and optional MCP for agentic capabilities.
 
-## 🎯 Project Goals
+## Overview
 
-- **Download & Process**: Full Wikipedia dump (~50GB) → Clean, searchable text chunks
-- **Vector Search**: FAISS-powered semantic search over Wikipedia content
-- **Local LLM**: Ollama + OpenWebUI for private, offline AI assistance  
-- **Agentic Tools**: MCP (Model Context Protocol) for autonomous reasoning and tool use
-- **Self-Contained**: Complete knowledge system running locally on MacBook Air M1
+This project demonstrates a complete end-to-end RAG pipeline that:
+- Processes Wikipedia dumps into searchable chunks
+- Generates semantic embeddings for intelligent retrieval
+- Uses FAISS for lightning-fast vector similarity search
+- Connects to local Ollama LLMs for generating contextual answers
+- Provides both CLI and web interfaces for interaction
+
+
+## Features
+
+- **Wikipedia Processing**: Parse and clean 262K+ articles from Simple English Wikipedia
+- **Semantic Search**: FAISS-powered vector search over 569K text chunks
+- **Local LLM**: Ollama integration with Mistral/Llama2 models
+- **Web Interface**: Beautiful chat UI via OpenWebUI or Flask
+- **Source Attribution**: Every answer includes relevant Wikipedia citations
+- **Offline Operation**: Complete system runs locally without internet
+- **Memory Efficient**: Optimized for 8GB RAM with batch processing
 
 ## 🏗️ Architecture
 
 ```
 Wikipedia XML → Parser → Chunker → Embeddings → FAISS Index
                                                       ↓
-                                              RAG Retrieval
+                                              RAG Retrieval ← User Query
                                                       ↓
-                                            Ollama LLM + MCP Agents
+                                            Context Formation
+                                                      ↓
+                                            Ollama LLM (Mistral)
+                                                      ↓
+                                              Generated Answer + Sources
 ```
 
-## 📊 Current Progress
+## 📊 Current Status
 
-- ✅ **Wikipedia Download**: Simple English Wikipedia (200MB → 800MB uncompressed)
-- ✅ **XML Parsing**: 262,105 articles extracted and cleaned
-- ✅ **Text Chunking**: 569,456 chunks created (avg 2.2 chunks/article)
-- ✅ **Embedding Generation**: 569K chunks → 384-dim vectors (834MB)
-- ✅ **FAISS Index**: Semantic search over 569K vectors (sub-second queries)
-- 🔄 **Next**: Ollama LLM integration for RAG conversations
-- 🔄 **Next**: OpenWebUI web interface
-- 🔄 **Next**: MCP agentic layer
+**Data Processing:**
+- ✅ Wikipedia parsing: 262,105 articles extracted
+- ✅ Text chunking: 569,456 searchable segments
+- ✅ Embeddings: 384-dim vectors using sentence-transformers
+- ✅ FAISS index: 834MB, cosine similarity search
+
+**LLM Integration:**
+- ✅ Ollama setup with Mistral 7B model
+- ✅ RAG pipeline connecting search to generation
+- ✅ Context-aware response generation
+- ✅ Source citation system
+
+**Interfaces:**
+- ✅ Interactive CLI chat
+- ✅ Flask web interface
+- ✅ OpenWebUI Docker integration
+
+**Next Steps:**
+- 🔄 MCP agents for autonomous reasoning
+- 🔄 Scale to full English Wikipedia (6.7M articles)
+- 🔄 Conversation memory and history
+- 🔄 Advanced retrieval strategies
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- MacBook Air M1 (8GB RAM, 256GB+ storage)
-- Python 3.9+
-- ~150GB free space for full Wikipedia (current test uses ~5GB)
+### What i'm using
+- MacBook Air M1 (8GB RAM, 256GB storage)
+- Python 3.9+, Docker (for OpenWebUI)
+- ~5GB for Simple Wikipedia, ~150GB for full Wikipedia
 
-### Setup
+### Installation
+
 ```bash
+# Clone the repository
 git clone https://github.com/bhavyashah10/wikipedia-rag-project.git
 cd wikipedia-rag-project
 
@@ -54,35 +86,80 @@ pip install -r requirements.txt
 python test_setup.py
 ```
 
-### Run Wikipedia Processing
+### Data Processing Pipeline
+
 ```bash
-# Download Simple English Wikipedia (for testing)
+# 1. Download Simple English Wikipedia (~200MB)
 curl -O https://dumps.wikimedia.org/simplewiki/latest/simplewiki-latest-pages-articles.xml.bz2
 mv simplewiki-latest-pages-articles.xml.bz2 data/raw/
 
-# Parse articles from XML
+# 2. Parse articles from XML (~5 minutes)
 python test_parser.py
 
-# Create text chunks
+# 3. Create text chunks
 python src/data_processing/text_chunker.py
 
-# Generate embeddings (10-15 minutes)
+# 4. Generate embeddings (~15 minutes)
 python src/embeddings/embedding_generator.py
 
-# Build FAISS index for search
+# 5. Build FAISS index (~3 minutes)
 python src/retrieval/faiss_indexer.py
 ```
 
-### Test the RAG System
-```bash
-# Test semantic search
-python src/retrieval/faiss_indexer.py
+### LLM Setup
 
-# Example queries that work:
+```bash
+# Install Ollama
+brew install ollama
+
+# Start Ollama service
+brew services start ollama
+
+# Pull Mistral model (~4GB, takes 5-10 minutes)
+ollama pull mistral
+
+# Or use Llama2
+# ollama pull llama2:7b-chat
+```
+
+### Running the System
+
+#### Option 1: CLI Chat Interface
+
+```bash
+# Start interactive chat
+python src/llm_integration/rag_pipeline.py
+
+# Example queries:
 # - "What is artificial intelligence?"
-# - "How do computers work?" 
-# - "Tell me about space exploration"
-# - "What is machine learning?"
+# - "Explain quantum computing"
+# - "Tell me about the Roman Empire"
+```
+
+
+#### Option 2: OpenWebUI (Recommended)
+
+```bash
+# Install and run OpenWebUI with Docker
+docker run -d -p 3000:8080 \
+  --add-host=host.docker.internal:host-gateway \
+  -v open-webui:/app/backend/data \
+  --name open-webui \
+  --restart always \
+  ghcr.io/open-webui/open-webui:main
+
+# Open browser to http://localhost:3000
+# Login and start chatting
+```
+
+#### Option 3: Flask Web Interface (Optional - Use if not using Option 2)
+
+```bash
+# Start web server
+cd src/llm_integration
+python web_interface.py
+
+# Open browser to http://localhost:5000
 ```
 
 ## 📁 Project Structure
@@ -91,89 +168,64 @@ python src/retrieval/faiss_indexer.py
 wikipedia-rag-project/
 ├── data/
 │   ├── raw/                    # Wikipedia XML dumps
-│   ├── processed/              # Clean articles & chunks (569K chunks)
-│   └── embeddings/             # FAISS indices & vectors (1.6GB)
+│   ├── processed/              # 569K clean chunks (JSON)
+│   └── embeddings/             # FAISS index + vectors (1.6GB)
 ├── src/
-│   ├── data_processing/        # XML parser & text chunker
-│   ├── embeddings/             # Embedding generation (sentence-transformers)
-│   ├── retrieval/              # FAISS search & RAG
-│   ├── llm_integration/        # Ollama interface (coming next)
-│   └── mcp_agents/             # MCP tools & agents (coming next)
-├── config/                     # YAML configurations
-├── notebooks/                  # Jupyter experiments
-└── logs/                       # Application logs
+│   ├── data_processing/
+│   │   ├── wikipedia_parser.py    # XML parsing & cleaning
+│   │   └── text_chunker.py        # Semantic text chunking
+│   ├── embeddings/
+│   │   └── embedding_generator.py # Vector embeddings (sentence-transformers)
+│   ├── retrieval/
+│   │   └── faiss_indexer.py       # FAISS index & similarity search
+│   ├── llm_integration/
+│   │   ├── rag_pipeline.py        # Complete RAG pipeline
+│   │   ├── web_interface.py       # Flask web server
+│   │   └── templates/
+│   │       └── chat.html          # Web UI
+│   └── mcp_agents/                # MCP tools (future)
+├── config/
+│   └── config.yaml             # System configuration
+├── logs/                       # Application logs
+├── requirements.txt            # Python dependencies
+├── test_setup.py              # Setup verification
+├── test_parser.py             # Parser testing
+└── check_setup.py             # System status check
+
 ```
 
 ## ⚙️ Configuration
 
-See `config/config.yaml` for:
-- Processing parameters (chunk size, overlap, filters)
-- Embedding model settings (sentence-transformers)
-- FAISS index configuration
-- LLM settings (Ollama models)
-- RAG retrieval parameters
+Edit `config/config.yaml` to customize:
 
-## 🧪 Current Test Results
+**Processing Settings:**
+```yaml
+processing:
+  chunk_size: 1000              # Characters per chunk
+  chunk_overlap: 200            # Overlap between chunks
+  min_article_length: 100       # Filter short articles
+```
 
-**Simple English Wikipedia Processing:**
-- **Input**: 200MB compressed XML
-- **Parsed**: 262,105 articles
-- **Chunks**: 569,456 text segments
-- **Average**: 2.2 chunks per article
-- **Processing Time**: ~5 minutes on M1 MacBook Air
+**Embedding Settings:**
+```yaml
+embeddings:
+  model_name: "sentence-transformers/all-MiniLM-L6-v2"
+  dimension: 384
+  normalize: true
+```
 
-**Embedding Generation:**
-- **Model**: sentence-transformers/all-MiniLM-L6-v2
-- **Vectors**: 569,456 × 384 dimensions
-- **Size**: 834MB embeddings + 132MB metadata
-- **Processing Time**: ~15 minutes on M1 MacBook Air
+**RAG Settings:**
+```yaml
+rag:
+  top_k: 5                      # Number of chunks to retrieve
+  score_threshold: 0.7          # Minimum similarity score
+  max_context_length: 4000      # Max characters in context
+```
 
-**FAISS Search Performance:**
-- **Index Size**: 834MB (cosine similarity, flat index)
-- **Search Speed**: Sub-second queries over 569K vectors
-- **Quality**: Excellent semantic relevance for test queries
-- **Memory Usage**: ~2GB RAM during search
-
-## 🛠️ Tech Stack
-
-- **Data Processing**: Python, lxml, BeautifulSoup
-- **Embeddings**: sentence-transformers (all-MiniLM-L6-v2)
-- **Vector DB**: FAISS (CPU-optimized for M1)
-- **LLM Serving**: Ollama (Llama2-7B, Mistral-7B)
-- **Web Interface**: OpenWebUI
-- **Agents**: MCP (Model Context Protocol)
-- **Hardware**: Optimized for Apple Silicon M1
-
-## 📈 Next Steps
-
-1. **Ollama Integration** - Local LLM serving (Llama2-7B, Mistral-7B)
-2. **RAG Pipeline** - Connect FAISS search to LLM responses
-3. **OpenWebUI** - Web-based chat interface
-4. **MCP Agents** - Tool use and autonomous reasoning
-5. **Scale to Full Wikipedia** - Process complete English Wikipedia (~6.7M articles)
-
-## 💡 Example Search Results
-
-The system already demonstrates excellent semantic search:
-
-**Query: "What is artificial intelligence?"**
-- ✅ Returns actual AI definition articles
-- ✅ Similarity scores: 0.540-0.640 (high relevance)
-- ✅ Sub-second response time
-
-**Query: "How do computers work?"**  
-- ✅ Finds computer architecture explanations
-- ✅ Returns technical details about processors, circuits
-- ✅ Perfect semantic matching (not just keyword search)
-
-## 🔧 Hardware Considerations
-
-**Current (Simple Wiki + RAG Search):**
-- Storage: ~5GB total (chunks + embeddings + index)
-- RAM: ~2GB during search, ~4GB during embedding generation
-- Processing: ~20 minutes total setup time
-
-**Full Wikipedia (Estimated):**
-- Storage: ~120-150GB total  
-- RAM: ~4-6GB during processing
-- Processing: ~2-4 hours total setup time
+**LLM Settings:**
+```yaml
+llm:
+  model: "mistral:latest"       # Ollama model to use
+  temperature: 0.7              # Response creativity
+  max_tokens: 2048              # Max response length
+```
